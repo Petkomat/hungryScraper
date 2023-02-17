@@ -1,10 +1,5 @@
-import sys
-from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
-import ssl
-from datetime import timedelta, date
-from scraper import Scraper, DailyMenu, Option
-import translators.server as tss
+from scraper import Scraper, DailyMenu
 
 
 class FE(Scraper):
@@ -16,7 +11,7 @@ class FE(Scraper):
     def _parse(self, soup: BeautifulSoup):
         parsed_tables = {}
         for candidate in soup.find_all("h3"):
-            day = Scraper.get_string(candidate, True)
+            day = Scraper.get_string(candidate)
             if day not in FE.DAYS:
                 continue
             parsed_table = []

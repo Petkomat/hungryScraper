@@ -73,6 +73,6 @@ class Scraper:
         raise NotImplementedError()
 
     @staticmethod
-    def get_string(html_element, recurse=False):
+    def get_string(html_element):
         text = html_element.text.replace("\n", " ").replace("\t", " ")
         return re.sub(" +", " ", text).strip()

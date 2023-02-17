@@ -40,4 +40,3 @@ async def fe_en(ctx):
 
 
 bot.run(TOKEN)
-
