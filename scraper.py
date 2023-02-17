@@ -2,6 +2,7 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from datetime import date, timedelta
 import translators.server as tss
+import re
 
 
 DAYS = {
@@ -72,6 +73,6 @@ class Scraper:
         raise NotImplementedError()
 
     @staticmethod
-    def get_string(html_element):
-        candidate = str(html_element.string).strip()
-        return "" if candidate == "None" else candidate
+    def get_string(html_element, recurse=False):
+        text = html_element.text.replace("\n", " ").replace("\t", " ")
+        return re.sub(" +", " ", text).strip()
