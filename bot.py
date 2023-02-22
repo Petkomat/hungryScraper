@@ -3,6 +3,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from scraper_loncek import Loncek
 from scraper_fe import FE
+from scraper_vila import Vila
 
 
 load_dotenv()
@@ -37,6 +38,20 @@ async def fe_en(ctx):
     fe = FE(True, True)
     fe.get_menu()
     await ctx.send(str(fe))
+
+
+@bot.command(name='vila-si')
+async def vila_si(ctx):
+    vila = Vila(False, True)
+    vila.get_menu()
+    await ctx.send(str(vila))
+
+
+@bot.command(name='vila-en')
+async def vila_en(ctx):
+    vila = Vila(True, True)
+    vila.get_menu()
+    await ctx.send(str(vila))
 
 
 bot.run(TOKEN)

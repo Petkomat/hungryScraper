@@ -1,8 +1,8 @@
-from scraper import Scraper, Option, DailyMenu
+from scraper import ScraperSoup, Option, DailyMenu
 from bs4 import BeautifulSoup
 
 
-class Loncek(Scraper):
+class Loncek(ScraperSoup):
     def __init__(self, english: bool, only_today: bool):
         super().__init__('https://loncek-kuhaj.si/tedenski-jedilnik-tp.php', english, only_today)
 
@@ -15,9 +15,9 @@ class Loncek(Scraper):
             if len(titles) != 1 or len(excerpts) != 1 or len(prices) > 1:
                 # print(f"Skipping:\n{candidate}")
                 continue
-            title = Scraper.get_string(titles[0])
-            excerpt = Scraper.get_string(excerpts[0])
-            price = Scraper.get_string(prices[0]) if prices else ""
+            title = ScraperSoup.get_string(titles[0])
+            excerpt = ScraperSoup.get_string(excerpts[0])
+            price = ScraperSoup.get_string(prices[0]) if prices else ""
             if title and (not excerpt or not price):
                 # (Zaprto, "", "2 €") or (Dnevna juha, Goveja, "")
                 daily_options.append([])

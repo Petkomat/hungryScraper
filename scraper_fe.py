@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
-from scraper import Scraper, DailyMenu
+from scraper import ScraperSoup, DailyMenu
 
 
-class FE(Scraper):
+class FE(ScraperSoup):
     DAYS = ["ponedeljek", "torek", "sreda", "četrtek", "petek"]
 
     def __init__(self, english: bool, only_today: bool):
@@ -11,7 +11,7 @@ class FE(Scraper):
     def _parse(self, soup: BeautifulSoup):
         parsed_tables = {}
         for candidate in soup.find_all("h3"):
-            day = Scraper.get_string(candidate)
+            day = ScraperSoup.get_string(candidate)
             if day not in FE.DAYS:
                 continue
             parsed_table = []
@@ -19,7 +19,7 @@ class FE(Scraper):
             for html_row in html_table.find_all("tr"):
                 parsed_row = []
                 for html_cell in html_row.find_all("td"):
-                    parsed_row.append(Scraper.get_string(html_cell))
+                    parsed_row.append(ScraperSoup.get_string(html_cell))
                 parsed_table.append(parsed_row)
             parsed_tables[day] = parsed_table
         for day in FE.DAYS:
