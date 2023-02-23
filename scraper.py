@@ -42,7 +42,8 @@ class Scraper:
         "Friday": "Petek"
     }
 
-    def __init__(self, url: str, english: bool, only_today: bool):
+    def __init__(self, name: str, url: str, english: bool, only_today: bool):
+        self.name = name
         self.url = url
         self.english = english
         self.only_today = only_today
@@ -67,15 +68,15 @@ class Scraper:
         everything = "\n".join(parts)
         if self.english:
             everything = tss.google(everything, 'sl', 'en')
-        return everything
+        return f"{self.name}:\n{everything}"
 
     def get_menu(self):
         raise NotImplementedError()
 
 
 class ScraperSoup(Scraper):
-    def __init__(self, url: str, english: bool, only_today: bool):
-        super().__init__(url, english, only_today)
+    def __init__(self, name: str, url: str, english: bool, only_today: bool):
+        super().__init__(name, url, english, only_today)
 
     def _get_soup(self):
         req = Request(url=self.url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -96,8 +97,8 @@ class ScraperSoup(Scraper):
 
 
 class ScraperSelenium(Scraper):
-    def __init__(self, url: str, english: bool, only_today: bool):
-        super().__init__(url, english, only_today)
+    def __init__(self, name: str, url: str, english: bool, only_today: bool):
+        super().__init__(name, url, english, only_today)
         self.success = False
 
     def __str__(self):

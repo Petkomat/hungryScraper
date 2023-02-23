@@ -4,7 +4,7 @@ import re
 
 class Vila(ScraperSelenium):
     def __init__(self, english: bool, only_today: bool):
-        super().__init__("https://www.facebook.com/vilateslova/?locale=sl_SI", english, only_today)
+        super().__init__("Vila Teslova", "https://www.facebook.com/vilateslova/?locale=sl_SI", english, only_today)
 
     def _parse(self, source: str):
         """

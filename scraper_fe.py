@@ -6,14 +6,16 @@ class FE(ScraperSoup):
     DAYS = ["ponedeljek", "torek", "sreda", "četrtek", "petek"]
 
     def __init__(self, english: bool, only_today: bool):
-        super().__init__('https://www.fe.uni-lj.si/o_fakulteti/restavracija/tedenski_meni/', english, only_today)
+        super().__init__("FE", 'https://www.fe.uni-lj.si/o_fakulteti/restavracija/tedenski_meni/', english, only_today)
 
     def _parse(self, soup: BeautifulSoup):
         parsed_tables = {}
-        for candidate in soup.find_all("h3"):
+        candidates = list(soup.find_all("h3")) + list(soup.find_all("strong"))
+        for candidate in candidates:
             day = ScraperSoup.get_string(candidate)
-            if day not in FE.DAYS:
+            if day.lower() not in FE.DAYS:
                 continue
+            day = day.lower()
             parsed_table = []
             html_table = candidate.findNext("table")
             for html_row in html_table.find_all("tr"):

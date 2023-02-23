@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 class Loncek(ScraperSoup):
     def __init__(self, english: bool, only_today: bool):
-        super().__init__('https://loncek-kuhaj.si/tedenski-jedilnik-tp.php', english, only_today)
+        super().__init__("Lonček", 'https://loncek-kuhaj.si/tedenski-jedilnik-tp.php', english, only_today)
 
     def _parse(self, soup: BeautifulSoup):
         daily_options = []
