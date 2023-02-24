@@ -5,8 +5,7 @@ from scraper_loncek import Loncek
 from scraper_fe import FE
 from scraper_vila import Vila
 from scraper import Scraper
-import time
-from typing import Callable, Tuple
+from typing import Callable
 
 
 load_dotenv()
