@@ -5,7 +5,7 @@ from scraper_loncek import Loncek
 from scraper_fe import FE
 from scraper_vila import Vila
 from scraper import Scraper
-from typing import Callable
+from typing import Union, List
 
 
 load_dotenv()
@@ -14,60 +14,94 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='!')
 
 
-async def send_single(ctx, s: Callable[[bool, bool], Scraper], english: bool, only_today: bool):
-    scraper = s(english, only_today)
-    scraper.get_menu()
-    await ctx.send(str(scraper))
+TODAY_SI_LONCEK = Loncek(False, True)
+TODAY_EN_LONCEK = Loncek(True, True)
+TODAY_SI_FE = FE(False, True)
+TODAY_EN_FE = FE(True, True)
+TODAY_SI_VILA = Vila(False, True)
+TODAY_EN_VILA = Vila(True, True)
+
+TODAY_SI = [TODAY_SI_LONCEK, TODAY_SI_FE, TODAY_SI_VILA]
+TODAY_EN = [TODAY_EN_LONCEK, TODAY_EN_FE, TODAY_EN_VILA]
+
+TODAY_LONCEK = [TODAY_SI_LONCEK, TODAY_EN_LONCEK]
+TODAY_FE = [TODAY_SI_FE, TODAY_EN_FE]
+TODAY_VILA = [TODAY_SI_VILA, TODAY_EN_VILA]
+
+TODAY = TODAY_SI + TODAY_EN
 
 
-async def send_all(ctx, english):
-    loncek = Loncek(english, True)
-    fe = FE(english, True)
-    vila = Vila(english, True)
-    all_locations = [loncek, fe, vila]
-    for location in all_locations:
-        location.get_menu()
-    await ctx.send("\n\n".join(str(location) for location in all_locations))
+def get_menus(scrapers: List[Scraper]):
+    for scraper in scrapers:
+        scraper.get_menu()
+
+
+async def send(ctx, scraper_s: Union[Scraper, List[Scraper]]):
+    scrapers = scraper_s if isinstance(scraper_s, list) else [scraper_s]
+    get_menus(scrapers)
+    await ctx.send("\n\n".join(str(scraper) for scraper in scrapers))
 
 
 @bot.command(name='loncek-si')
 async def loncek_si(ctx):
-    await send_single(ctx, Loncek, False, True)
+    await send(ctx, TODAY_SI_LONCEK)
 
 
 @bot.command(name='loncek-en')
 async def loncek_en(ctx):
-    await send_single(ctx, Loncek, True, True)
+    await send(ctx, TODAY_EN_LONCEK)
+
+
+@bot.command(name='loncek')
+async def loncek_en(ctx):
+    await send(ctx, TODAY_LONCEK)
 
 
 @bot.command(name='fe-si')
 async def fe_si(ctx):
-    await send_single(ctx, FE, False, True)
+    await send(ctx, TODAY_SI_FE)
 
 
 @bot.command(name='fe-en')
 async def fe_en(ctx):
-    await send_single(ctx, FE, True, True)
+    await send(ctx, TODAY_EN_FE)
+
+
+@bot.command(name='fe')
+async def fe_en(ctx):
+    await send(ctx, TODAY_FE)
 
 
 @bot.command(name='vila-si')
 async def vila_si(ctx):
-    await send_single(ctx, Vila, False, True)
+    await send(ctx, TODAY_SI_VILA)
 
 
 @bot.command(name='vila-en')
 async def vila_en(ctx):
-    await send_single(ctx, Vila, True, True)
+    await send(ctx, TODAY_EN_VILA)
+
+
+@bot.command(name='vila')
+async def vila_en(ctx):
+    await send(ctx, TODAY_VILA)
 
 
 @bot.command(name='all-si')
 async def all_si(ctx):
-    await send_all(ctx, False)
+    await send(ctx, TODAY_SI)
 
 
 @bot.command(name='all-en')
 async def all_en(ctx):
-    await send_all(ctx, True)
+    await send(ctx, TODAY_EN)
 
 
-bot.run(TOKEN)
+@bot.command(name='all')
+async def all_en(ctx):
+    await send(ctx, TODAY_SI + TODAY_EN)
+
+
+if __name__ == '__main__':
+    get_menus(TODAY)
+    bot.run(TOKEN)

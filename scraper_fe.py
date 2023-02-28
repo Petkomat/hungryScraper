@@ -40,5 +40,5 @@ class FE(ScraperSoup):
 
 if __name__ == "__main__":
     x = FE(False, True)
-    x.get_menu()
+    x._get_menu()
     print(str(x))

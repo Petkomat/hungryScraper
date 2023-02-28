@@ -65,13 +65,20 @@ class Scraper:
             parts.append(f"{weekday} ({actual_date.day}. {actual_date.month}. {actual_date.year})")
             parts.append(str(daily_menu))
             parts.append("\n")
-        everything = "\n".join(parts)
+        everything = "\n\n".join(parts)
         if self.english:
             everything = tss.google(everything, 'sl', 'en')
         return f"{self.name}:\n{everything}"
 
-    def get_menu(self):
+    def _get_menu(self):
         raise NotImplementedError()
+
+    def _has_menu(self):
+        return self.monday == Scraper.this_monday() and self.menus
+
+    def get_menu(self):
+        if not self._has_menu():
+            self._get_menu()
 
 
 class ScraperSoup(Scraper):
@@ -83,7 +90,7 @@ class ScraperSoup(Scraper):
         webpage = urlopen(req).read()
         return BeautifulSoup(webpage, 'html.parser')
 
-    def get_menu(self):
+    def _get_menu(self):
         soup = self._get_soup()
         self._parse(soup)
 
@@ -122,7 +129,7 @@ class ScraperSelenium(Scraper):
         time.sleep(2)
         return driver.page_source
 
-    def get_menu(self):
+    def _get_menu(self):
         source = self._get_source()
         self._parse(source)
 

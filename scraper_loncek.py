@@ -43,12 +43,12 @@ class Loncek(ScraperSoup):
 
 if __name__ == "__main__":
     a = Loncek(False, False)
-    a.get_menu()
+    a._get_menu()
     print(a)
     a = Loncek(False, True)
-    a.get_menu()
+    a._get_menu()
     print(a)
 
     a = Loncek(True, False)
-    a.get_menu()
+    a._get_menu()
     print(a)
