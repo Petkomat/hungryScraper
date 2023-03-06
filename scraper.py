@@ -65,6 +65,7 @@ class Scraper:
             parts.append(f"{weekday} ({actual_date.day}. {actual_date.month}. {actual_date.year})")
             parts.append(str(daily_menu))
             parts.append("\n")
+        parts.pop()
         everything = "\n\n".join(parts)
         if self.english:
             everything = tss.google(everything, 'sl', 'en')
@@ -78,6 +79,7 @@ class Scraper:
 
     def get_menu(self):
         if not self._has_menu():
+            self.menus = []
             self._get_menu()
 
 

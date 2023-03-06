@@ -28,7 +28,7 @@ TODAY_LONCEK = [TODAY_SI_LONCEK, TODAY_EN_LONCEK]
 TODAY_FE = [TODAY_SI_FE, TODAY_EN_FE]
 TODAY_VILA = [TODAY_SI_VILA, TODAY_EN_VILA]
 
-TODAY = TODAY_SI + TODAY_EN
+TODAY = TODAY_LONCEK + TODAY_FE + TODAY_VILA
 
 
 def get_menus(scrapers: List[Scraper]):
@@ -39,7 +39,15 @@ def get_menus(scrapers: List[Scraper]):
 async def send(ctx, scraper_s: Union[Scraper, List[Scraper]]):
     scrapers = scraper_s if isinstance(scraper_s, list) else [scraper_s]
     get_menus(scrapers)
-    await ctx.send("\n\n".join(str(scraper) for scraper in scrapers))
+    message = "\n\n".join(str(scraper) for scraper in scrapers)
+    max_size = 1500
+    parts = list(range(0, len(message), max_size)) + [len(message)]
+    for i_part, i_start in enumerate(parts[:-1]):
+        i_end = parts[i_part + 1]
+        actual_message = message[i_start: i_end]
+        if i_end != len(message):
+            actual_message += "..."
+        await ctx.send(actual_message)
 
 
 @bot.command(name='loncek-si')
@@ -99,7 +107,7 @@ async def all_en(ctx):
 
 @bot.command(name='all')
 async def all_en(ctx):
-    await send(ctx, TODAY_SI + TODAY_EN)
+    await send(ctx, TODAY)
 
 
 if __name__ == '__main__':
