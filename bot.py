@@ -1,4 +1,5 @@
 import os
+import logging
 from discord.ext import commands
 from dotenv import load_dotenv
 from scraper_loncek import Loncek
@@ -6,6 +7,23 @@ from scraper_fe import FE
 from scraper_vila import Vila
 from scraper import Scraper
 from typing import Union, List
+
+
+def create_logger(name):
+    ch = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "%(asctime)s %(levelname)s [%(filename)s:%(funcName)s:%(lineno)d]:  %(message)s",
+        "%Y-%m-%d %H:%M:%S"
+    )
+    ch.setFormatter(formatter)
+    logger = logging.getLogger(name)
+    logger.addHandler(ch)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    return logger
+
+
+LOGGER = create_logger(__file__)
 
 
 load_dotenv()
@@ -38,6 +56,7 @@ def get_menus(scrapers: List[Scraper]):
 
 async def send(ctx, scraper_s: Union[Scraper, List[Scraper]]):
     scrapers = scraper_s if isinstance(scraper_s, list) else [scraper_s]
+    LOGGER.info(f"Request for {[scraper.name for scraper in scrapers]}")
     get_menus(scrapers)
     message = "\n\n".join(str(scraper) for scraper in scrapers)
     max_size = 1500
