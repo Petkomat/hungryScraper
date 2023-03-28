@@ -81,6 +81,7 @@ class Scraper:
         if not self._has_menu():
             self.menus = []
             self._get_menu()
+            self.monday = Scraper.this_monday()
 
 
 class ScraperSoup(Scraper):

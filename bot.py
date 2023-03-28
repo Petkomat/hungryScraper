@@ -80,7 +80,7 @@ async def loncek_en(ctx):
 
 
 @bot.command(name='loncek')
-async def loncek_en(ctx):
+async def loncek(ctx):
     await send(ctx, TODAY_LONCEK)
 
 
@@ -95,7 +95,7 @@ async def fe_en(ctx):
 
 
 @bot.command(name='fe')
-async def fe_en(ctx):
+async def fe(ctx):
     await send(ctx, TODAY_FE)
 
 
@@ -110,7 +110,7 @@ async def vila_en(ctx):
 
 
 @bot.command(name='vila')
-async def vila_en(ctx):
+async def vila(ctx):
     await send(ctx, TODAY_VILA)
 
 
@@ -125,7 +125,7 @@ async def all_en(ctx):
 
 
 @bot.command(name='all')
-async def all_en(ctx):
+async def all(ctx):
     await send(ctx, TODAY)
 
 
