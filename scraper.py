@@ -55,6 +55,10 @@ class Scraper:
         today = date.today()
         return today - timedelta(days=today.weekday())
 
+    @staticmethod
+    def index_of_today():
+        return date.today().weekday()
+
     def __str__(self):
         parts = []
         for days_delta, daily_menu in enumerate(self.menus):

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from scraper_loncek import Loncek
 from scraper_fe import FE
 from scraper_vila import Vila
+from scraper_mafija import Mafija
 from scraper import Scraper
 from typing import Union, List
 
@@ -38,15 +39,19 @@ TODAY_SI_FE = FE(False, True)
 TODAY_EN_FE = FE(True, True)
 TODAY_SI_VILA = Vila(False, True)
 TODAY_EN_VILA = Vila(True, True)
+TODAY_SI_MAFIJA = Mafija(False, True)
+TODAY_EN_MAFIJA = Mafija(True, True)
 
-TODAY_SI = [TODAY_SI_LONCEK, TODAY_SI_FE, TODAY_SI_VILA]
-TODAY_EN = [TODAY_EN_LONCEK, TODAY_EN_FE, TODAY_EN_VILA]
+
+TODAY_SI = [TODAY_SI_LONCEK, TODAY_SI_FE, TODAY_SI_VILA, TODAY_SI_MAFIJA]
+TODAY_EN = [TODAY_EN_LONCEK, TODAY_EN_FE, TODAY_EN_VILA, TODAY_EN_MAFIJA]
 
 TODAY_LONCEK = [TODAY_SI_LONCEK, TODAY_EN_LONCEK]
 TODAY_FE = [TODAY_SI_FE, TODAY_EN_FE]
 TODAY_VILA = [TODAY_SI_VILA, TODAY_EN_VILA]
+TODAY_MAFIJA = [TODAY_SI_MAFIJA, TODAY_EN_MAFIJA]
 
-TODAY = TODAY_LONCEK + TODAY_FE + TODAY_VILA
+TODAY = TODAY_LONCEK + TODAY_FE + TODAY_VILA + TODAY_MAFIJA
 
 
 def get_menus(scrapers: List[Scraper]):
@@ -112,6 +117,21 @@ async def vila_en(ctx):
 @bot.command(name='vila')
 async def vila(ctx):
     await send(ctx, TODAY_VILA)
+
+
+@bot.command(name='mafija-si')
+async def mafija_si(ctx):
+    await send(ctx, TODAY_SI_MAFIJA)
+
+
+@bot.command(name='mafija-en')
+async def mafija_en(ctx):
+    await send(ctx, TODAY_EN_MAFIJA)
+
+
+@bot.command(name='mafija')
+async def mafija(ctx):
+    await send(ctx, TODAY_MAFIJA)
 
 
 @bot.command(name='all-si')
