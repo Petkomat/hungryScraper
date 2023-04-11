@@ -1,5 +1,4 @@
 import os
-import logging
 from discord.ext import commands
 from dotenv import load_dotenv
 from scraper_loncek import Loncek
@@ -7,21 +6,8 @@ from scraper_fe import FE
 from scraper_vila import Vila
 from scraper_mafija import Mafija
 from scraper import Scraper
+from helpers import create_logger
 from typing import Union, List
-
-
-def create_logger(name):
-    ch = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)s [%(filename)s:%(funcName)s:%(lineno)d]:  %(message)s",
-        "%Y-%m-%d %H:%M:%S"
-    )
-    ch.setFormatter(formatter)
-    logger = logging.getLogger(name)
-    logger.addHandler(ch)
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-    return logger
 
 
 LOGGER = create_logger(__file__)

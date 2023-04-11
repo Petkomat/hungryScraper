@@ -1,5 +1,9 @@
 from scraper import ScraperSelenium, Option
+from helpers import create_logger
 import re
+
+
+LOGGER = create_logger(__file__)
 
 
 class Vila(ScraperSelenium):
@@ -20,32 +24,38 @@ class Vila(ScraperSelenium):
         done = False
         any_candidates = False
         candidates = re.findall('"message": ?\\{[^}]+"text": ?"([^"}]+)"', source)
-        print(f"Have {len(candidates)} candidates")
+        LOGGER.info(f"Have {len(candidates)} candidates")
         for candidate in candidates:
             any_candidates = True
             done = self.try_add(ScraperSelenium.unescape(candidate))
             if done:
                 break
             else:
-                print("Candidate failure:", candidate)
+                LOGGER.info("Candidate failure:", candidate)
         if not any_candidates:
-            print("No candidates in\n", source)
+            LOGGER.info("No candidates in\n", source)
         if not done:
-            print("Did not find any menu")
+            LOGGER.info("Did not find any menu")
         else:
             self.success = True
 
     def try_add(self, candidate: str):
         c_lower = candidate.lower()
         i_days = [(day, c_lower.find(day.lower())) for day in ScraperSelenium.DAYS.values()]
-        if min([i for _, i in i_days]) < 0:
-            print(candidate, "contains no jedilnik")
+        present = [day for day, i in i_days if i >= 0]
+        if not present:
+            LOGGER.info(f"{candidate} contains no jedilnik")
             return False
+        elif len(present) < 5:
+            LOGGER.warning(f"Not all the days are present, but assuming this is still jedilnik: {candidate}")
         i_days.append(("sentinel", len(candidate)))
         for i, (day, i_day) in enumerate(i_days[:-1]):
-            description = candidate[i_day + len(day) + 1: i_days[i + 1][1]].strip()
-            description = "\n".join(line.strip() for line in description.split("\n")) + "\n"
-            self.menus.append(Option(description, "NEZNANE CENE"))
+            if i_day >= 0:
+                description = candidate[i_day + len(day) + 1: i_days[i + 1][1]].strip()
+                description = "\n".join(line.strip() for line in description.split("\n")) + "\n"
+            else:
+                description = "neznano"
+            self.menus.append(Option(description, "mora neznana cena"))
         return True
 
 
