@@ -124,6 +124,19 @@ async def handler(ctx, *args):
     await send(ctx, scrapers)
 
 
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(
+            "Unknown command! Correct syntax: `!food [language] [location]`.\n"
+            "None of the arguments is necessary and their order is arbitrary. "
+            "Possible options:\n"
+            f"language: {list(LANGUAGES)}\n"
+            f"location: {list(LOCATIONS)}"
+        )
+    else:
+        await ctx.send(f"Unknown error: {error}")
+
 if __name__ == '__main__':
     get_menus(list(SCRAPERS.values()))
     bot.run(TOKEN)

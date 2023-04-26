@@ -7,6 +7,13 @@ LOGGER = create_logger(__file__)
 
 
 class Vila(ScraperSelenium):
+    SPECIAL_LINES = [
+        "[*]Dnevna juha",
+        "[*]Gurmansko kosilo",
+        "[*]Sladica",
+        "Stalna ponudba"
+    ]
+
     def __init__(self, english: bool, only_today: bool):
         super().__init__(
             "Vila Teslova",
@@ -18,18 +25,28 @@ class Vila(ScraperSelenium):
 
     def _parse(self, source: str):
         """
-        We want to find a message whose text contains tedenski meni or ponedeljek ...
+        We want to find a message whose text contains 
+        tedenski meni or ponedeljek ...
 
-        "message": {... , "text": "Pozdravljeni!\nKako ste pa vi za\u010deli teden? /.../ Tedenski meni 20.2. - 24.2.\nPonedeljek: ... }
+        "message": {
+            ... ,
+            "text": "Pozdravljeni!\nKako ste pa vi 
+                    za\u010deli teden? /.../ 
+                    Tedenski meni 20.2. - 24.2.\nPonedeljek: ... 
+        }
 
-        or "text": "Naša terasa je že /.../, do takrat pa imamo tu tedenski meni (13.2. - 17.2.) Ponedeljek:
-            - Piščančji paprikaš s krompirjem, kruh ...
+        or "text": "Naša terasa je že /.../, do takrat pa imamo 
+                    tu tedenski meni (13.2. - 17.2.) Ponedeljek:
+                    - Piščančji paprikaš s krompirjem, kruh ...
         :param source:
         :return:
         """
         done = False
         any_candidates = False
-        candidates = re.findall('"message": ?\\{[^}]+"text": ?"([^"}]+)"', source)
+        candidates = re.findall(
+            '"message": ?\\{[^}]+"text": ?"([^"}]+)"',
+            source
+        )
         LOGGER.info(f"Have {len(candidates)} candidates")
         for candidate in candidates:
             any_candidates = True
@@ -46,23 +63,49 @@ class Vila(ScraperSelenium):
             self.success = True
 
     def try_add(self, candidate: str):
-        c_lower = candidate.lower()
-        i_days = [(day, c_lower.find(day.lower())) for day in ScraperSelenium.DAYS.values()]
-        present = [day for day, i in i_days if i >= 0]
+        day_matches = [
+            Vila._extract_for_day(candidate, day)
+            for day in ScraperSelenium.DAYS.values()
+        ]
+        present = [match for match in day_matches if match is not None]
         if not present:
             LOGGER.info(f"{candidate} contains no jedilnik")
             return False
         elif len(present) < 5:
-            LOGGER.warning(f"Not all the days are present, but assuming this is still jedilnik: {candidate}")
-        i_days.append(("sentinel", len(candidate)))
-        for i, (day, i_day) in enumerate(i_days[:-1]):
-            if i_day >= 0:
-                description = candidate[i_day + len(day) + 1: i_days[i + 1][1]].strip()
-                description = "\n".join(line.strip() for line in description.split("\n")) + "\n"
+            LOGGER.warning(
+                "Not all the days are present, "
+                f"but assuming this is still jedilnik: {candidate}"
+            )
+        everyday_offers = []
+        for special in Vila.SPECIAL_LINES:
+            match = Vila._extract_for_day(candidate, special)
+            if match is not None:
+                everyday_offers.append(match.group(1))
+        additional_options = "\n".join(everyday_offers)
+        for day_match in day_matches:
+            if day_match is not None:
+                description = day_match.group(1).strip()
+                lines = [line.strip() for line in description.split("\n")]
+                if additional_options:
+                    lines.append(additional_options)
+                description = "\n".join(lines) + "\n"
             else:
                 description = "neznano"
             self.menus.append(Option(description, "morda neznana cena"))
         return True
+
+    @staticmethod
+    def _extract_for_day(candidate: str, start: str):
+        stop_words = list(ScraperSelenium.DAYS.values())
+        stop_words.extend(Vila.SPECIAL_LINES)
+        stop = "|".join(stop_words)
+        if start in ScraperSelenium.DAYS.values():
+            pattern = start + r":?\s*\n(.+)" + f"({stop})?"
+            flags = re.I | re.DOTALL
+        else:
+            pattern = "(" + start + r":?.+)" + f"({stop})?"
+            flags = re.I
+        return re.search(pattern, candidate, flags=flags)
 
 
 if __name__ == "__main__":
