@@ -70,11 +70,13 @@ class Scraper:
     def __str__(self):
         parts = []
         for days_delta, daily_menu in enumerate(self.menus):
-            actual_date = self.monday + timedelta(days=days_delta)
-            if self.only_today and actual_date != date.today():
+            today = self.monday + timedelta(days=days_delta)
+            if self.only_today and today != date.today():
                 continue
-            weekday = Scraper.DAYS[actual_date.strftime("%A")]
-            parts.append(f"{weekday} ({actual_date.day}. {actual_date.month}. {actual_date.year})")
+            weekday = Scraper.DAYS[today.strftime("%A")]
+            parts.append(
+                f"{weekday} ({today.day}. {today.month}. {today.year})"
+            )
             parts.append(str(daily_menu))
             parts.append("\n")
         if parts:
@@ -82,7 +84,7 @@ class Scraper:
         everything = "\n\n".join(parts)
         if self.english:
             everything = tss.google(everything, 'sl', 'en')
-        return f"{self.name}:\n{everything}"
+        return f"**{self.name}** {self.emoji}:\n{everything}"
 
     def _get_menu(self):
         raise NotImplementedError()

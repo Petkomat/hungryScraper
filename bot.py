@@ -18,26 +18,30 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix='!')
 
+LANGUAGES = {
+    "sl": "si",
+    "si": "si",
+    "en": "en"
+}
+LOCATIONS = {
+    "loncek": "loncek",
+    "mafija": "mafija",
+    "fe": "fe",
+    "elektro": "fe",
+    "vila": "vila"
+}
 
-TODAY_SI_LONCEK = Loncek(False, True)
-TODAY_EN_LONCEK = Loncek(True, True)
-TODAY_SI_FE = FE(False, True)
-TODAY_EN_FE = FE(True, True)
-TODAY_SI_VILA = Vila(False, True)
-TODAY_EN_VILA = Vila(True, True)
-TODAY_SI_MAFIJA = Mafija(False, True)
-TODAY_EN_MAFIJA = Mafija(True, True)
 
-
-TODAY_SI = [TODAY_SI_LONCEK, TODAY_SI_FE, TODAY_SI_VILA, TODAY_SI_MAFIJA]
-TODAY_EN = [TODAY_EN_LONCEK, TODAY_EN_FE, TODAY_EN_VILA, TODAY_EN_MAFIJA]
-
-TODAY_LONCEK = [TODAY_SI_LONCEK, TODAY_EN_LONCEK]
-TODAY_FE = [TODAY_SI_FE, TODAY_EN_FE]
-TODAY_VILA = [TODAY_SI_VILA, TODAY_EN_VILA]
-TODAY_MAFIJA = [TODAY_SI_MAFIJA, TODAY_EN_MAFIJA]
-
-TODAY = TODAY_LONCEK + TODAY_FE + TODAY_VILA + TODAY_MAFIJA
+SCRAPERS = {
+    ("si", "today", "loncek"): Loncek(False, True),
+    ("en", "today", "loncek"):  Loncek(True, True),
+    ("si", "today", "fe"): FE(False, True),
+    ("en", "today", "fe"): FE(True, True),
+    ("si", "today", "vila"): Vila(False, True),
+    ("en", "today", "vila"): Vila(True, True),
+    ("si", "today", "mafija"): Mafija(False, True),
+    ("en", "today", "mafija"): Mafija(True, True)
+}
 
 
 def get_menus(scrapers: List[Scraper]):
@@ -68,81 +72,58 @@ async def send(
             await last_message.add_reaction(emoji)
 
 
-@bot.command(name='loncek-si')
-async def loncek_si(ctx):
-    await send(ctx, TODAY_SI_LONCEK)
+async def send_warning(ctx, warning):
+    await ctx.send(warning)
 
 
-@bot.command(name='loncek-en')
-async def loncek_en(ctx):
-    await send(ctx, TODAY_EN_LONCEK)
+def normalize_arguments(args: List[str]):
+    normalized = []
+    unknown = []
+    for arg in args:
+        if arg in LANGUAGES:
+            normalized.append(LANGUAGES[arg])
+        elif arg in LOCATIONS:
+            normalized.append(LOCATIONS[arg])
+        else:
+            unknown.append(arg)
+    return normalized, unknown
 
 
-@bot.command(name='loncek')
-async def loncek(ctx):
-    await send(ctx, TODAY_LONCEK)
+def get_location_lanugage(args: List[str]):
+    location = "all"
+    language = "all"
+    for arg in args:
+        if arg in LOCATIONS:
+            location = arg
+        elif arg in LANGUAGES:
+            language = arg
+    LOGGER.debug(f"{args} --> {location}, {language}")
+    return location, language
 
 
-@bot.command(name='fe-si')
-async def fe_si(ctx):
-    await send(ctx, TODAY_SI_FE)
+def filter_scrapers(chosen_location, chosen_language):
+    appropriate = []
+    for (lan, _, loc), scraper in SCRAPERS.items():
+        if chosen_language in ["all", lan] and chosen_location in ["all", loc]:
+            appropriate.append(scraper)
+    return appropriate
 
 
-@bot.command(name='fe-en')
-async def fe_en(ctx):
-    await send(ctx, TODAY_EN_FE)
-
-
-@bot.command(name='fe')
-async def fe(ctx):
-    await send(ctx, TODAY_FE)
-
-
-@bot.command(name='vila-si')
-async def vila_si(ctx):
-    await send(ctx, TODAY_SI_VILA)
-
-
-@bot.command(name='vila-en')
-async def vila_en(ctx):
-    await send(ctx, TODAY_EN_VILA)
-
-
-@bot.command(name='vila')
-async def vila(ctx):
-    await send(ctx, TODAY_VILA)
-
-
-@bot.command(name='mafija-si')
-async def mafija_si(ctx):
-    await send(ctx, TODAY_SI_MAFIJA)
-
-
-@bot.command(name='mafija-en')
-async def mafija_en(ctx):
-    await send(ctx, TODAY_EN_MAFIJA)
-
-
-@bot.command(name='mafija')
-async def mafija(ctx):
-    await send(ctx, TODAY_MAFIJA)
-
-
-@bot.command(name='all-si')
-async def all_si(ctx):
-    await send(ctx, TODAY_SI)
-
-
-@bot.command(name='all-en')
-async def all_en(ctx):
-    await send(ctx, TODAY_EN)
-
-
-@bot.command(name='all')
-async def all(ctx):
-    await send(ctx, TODAY)
+@bot.command(name="food")
+async def handler(ctx, *args):
+    normalized, unknown = normalize_arguments(args)
+    if unknown:
+        send_warning(
+            ctx,
+            f"There were some unknown arguments: {unknown}. "
+            "Ignoring your command."
+        )
+        return
+    loc, lan = get_location_lanugage(normalized)
+    scrapers = filter_scrapers(loc, lan)
+    await send(ctx, scrapers)
 
 
 if __name__ == '__main__':
-    get_menus(TODAY)
+    get_menus(list(SCRAPERS.values()))
     bot.run(TOKEN)
