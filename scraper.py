@@ -191,11 +191,15 @@ class ScraperSelenium(Scraper):
                         parts.append(c)
                     except UnicodeEncodeError:
                         print(
-                            f"Cannot decode source[{i + 2}:{i + 6}] = {code} as a single character (probably emoticon?)"
+                            f"Cannot decode source[{i + 2}:{i + 6}] = {code} "
+                            "as a single character (probably emoticon?)"
                         )
                     i += 6
                 else:
-                    raise ValueError(f"Unexpected continuation after \\: {source[i + 1: i + 10]}")
+                    raise ValueError(
+                        "Unexpected continuation after \\: "
+                        f"{source[i + 1: i + 10]}"
+                    )
             else:
                 parts.append(character)
                 i += 1

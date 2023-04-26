@@ -22,17 +22,17 @@ class Vila(ScraperSelenium):
 
     def _parse(self, source: str):
         """
-        We want to find a message whose text contains 
+        We want to find a message whose text contains
         tedenski meni or ponedeljek ...
 
         "message": {
             ... ,
-            "text": "Pozdravljeni!\nKako ste pa vi 
-                    za\u010deli teden? /.../ 
-                    Tedenski meni 20.2. - 24.2.\nPonedeljek: ... 
+            "text": "Pozdravljeni!\nKako ste pa vi
+                    za\u010deli teden? /.../
+                    Tedenski meni 20.2. - 24.2.\nPonedeljek: ...
         }
 
-        or "text": "Naša terasa je že /.../, do takrat pa imamo 
+        or "text": "Naša terasa je že /.../, do takrat pa imamo
                     tu tedenski meni (13.2. - 17.2.) Ponedeljek:
                     - Piščančji paprikaš s krompirjem, kruh ...
         :param source:
