@@ -8,9 +8,6 @@ LOGGER = create_logger(__file__)
 
 class Vila(ScraperSelenium):
     SPECIAL_LINES = [
-        "[*]Dnevna juha",
-        "[*]Gurmansko kosilo",
-        "[*]Sladica",
         "Stalna ponudba"
     ]
 
@@ -99,11 +96,12 @@ class Vila(ScraperSelenium):
         stop_words = list(ScraperSelenium.DAYS.values())
         stop_words.extend(Vila.SPECIAL_LINES)
         stop = "|".join(stop_words)
+        stop_pattern = f"(?:(?!{stop}).)*"
         if start in ScraperSelenium.DAYS.values():
-            pattern = start + r":?\s*\n(.+)" + f"({stop})?"
+            pattern = start + r":?\s*\n(" + stop_pattern + ")"
             flags = re.I | re.DOTALL
         else:
-            pattern = "(" + start + r":?.+)" + f"({stop})?"
+            pattern = "(" + start + r":?" + stop_pattern + ")"
             flags = re.I
         return re.search(pattern, candidate, flags=flags)
 
