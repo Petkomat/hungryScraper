@@ -6,7 +6,13 @@ class FE(ScraperSoup):
     DAYS = ["ponedeljek", "torek", "sreda", "četrtek", "petek"]
 
     def __init__(self, english: bool, only_today: bool):
-        super().__init__("FE", 'https://www.fe.uni-lj.si/o_fakulteti/restavracija/tedenski_meni/', english, only_today)
+        super().__init__(
+            "FE",
+            'https://www.fe.uni-lj.si/o_fakulteti/restavracija/tedenski_meni/',
+            english,
+            only_today,
+            "⚡"
+        )
 
     def _parse(self, soup: BeautifulSoup):
         parsed_tables = {}

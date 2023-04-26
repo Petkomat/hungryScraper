@@ -8,7 +8,13 @@ LOGGER = create_logger(__file__)
 
 class Vila(ScraperSelenium):
     def __init__(self, english: bool, only_today: bool):
-        super().__init__("Vila Teslova", "https://www.facebook.com/vilateslova/?locale=sl_SI", english, only_today)
+        super().__init__(
+            "Vila Teslova",
+            "https://www.facebook.com/vilateslova/?locale=sl_SI",
+            english,
+            only_today,
+            "🧚‍♀️"
+        )
 
     def _parse(self, source: str):
         """
@@ -55,7 +61,7 @@ class Vila(ScraperSelenium):
                 description = "\n".join(line.strip() for line in description.split("\n")) + "\n"
             else:
                 description = "neznano"
-            self.menus.append(Option(description, "mora neznana cena"))
+            self.menus.append(Option(description, "morda neznana cena"))
         return True
 
 

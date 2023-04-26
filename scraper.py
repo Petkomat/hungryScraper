@@ -42,11 +42,19 @@ class Scraper:
         "Friday": "Petek"
     }
 
-    def __init__(self, name: str, url: str, english: bool, only_today: bool):
+    def __init__(
+            self,
+            name: str,
+            url: str,
+            english: bool,
+            only_today: bool,
+            emoji: str
+    ):
         self.name = name
         self.url = url
         self.english = english
         self.only_today = only_today
+        self.emoji = emoji
         self.monday = Scraper.this_monday()
         self.menus = []
 
@@ -90,8 +98,15 @@ class Scraper:
 
 
 class ScraperSoup(Scraper):
-    def __init__(self, name: str, url: str, english: bool, only_today: bool):
-        super().__init__(name, url, english, only_today)
+    def __init__(
+            self,
+            name: str,
+            url: str,
+            english: bool,
+            only_today: bool,
+            emoji: str
+    ):
+        super().__init__(name, url, english, only_today, emoji)
 
     def _get_soup(self):
         req = Request(url=self.url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -112,8 +127,15 @@ class ScraperSoup(Scraper):
 
 
 class ScraperSelenium(Scraper):
-    def __init__(self, name: str, url: str, english: bool, only_today: bool):
-        super().__init__(name, url, english, only_today)
+    def __init__(
+            self,
+            name: str,
+            url: str,
+            english: bool,
+            only_today: bool,
+            emoji: str
+    ):
+        super().__init__(name, url, english, only_today, emoji)
         self.success = False
 
     def __str__(self):

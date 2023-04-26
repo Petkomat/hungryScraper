@@ -5,8 +5,17 @@ from bs4 import BeautifulSoup
 class Mafija(ScraperSoup):
     def __init__(self, english: bool, only_today: bool):
         if not only_today:
-            raise ValueError("Menu for the whole week is not accessible. Set only_today to True")
-        super().__init__("Mafija", 'https://www.studentska-prehrana.si/sl/restaurant/Details/2993', english, only_today)
+            raise ValueError(
+                "Menu for the whole week is not accessible. "
+                "Set only_today to True"
+            )
+        super().__init__(
+            "Mafija",
+            'https://www.studentska-prehrana.si/sl/restaurant/Details/2993',
+            english,
+            only_today,
+            "🔫"
+        )
         self.today = -1
 
     def _has_menu(self):
@@ -17,7 +26,7 @@ class Mafija(ScraperSoup):
         self.today = Mafija.index_of_today()
 
     def _parse(self, soup: BeautifulSoup):
-        parsed_daily = "nekaj danes"  # TODO Sparsaj soup za tole
+        parsed_daily = "nekaj danes (@Katja)"  # TODO Sparsaj soup za tole
         parsed_every_day = ["sendviči", "tortilje", "solate"]  # lahko tudi to :)
         the_daily_option = Option(f"Dnevna ponudba: {parsed_daily}", price="neznana cena")
         everyday_options = Option(f"Ostalo: {'; '.join(parsed_every_day)}", price="razne cene")

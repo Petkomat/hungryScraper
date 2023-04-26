@@ -45,19 +45,27 @@ def get_menus(scrapers: List[Scraper]):
         scraper.get_menu()
 
 
-async def send(ctx, scraper_s: Union[Scraper, List[Scraper]]):
+async def send(
+        ctx,
+        scraper_s: Union[Scraper, List[Scraper]]
+):
     scrapers = scraper_s if isinstance(scraper_s, list) else [scraper_s]
     LOGGER.info(f"Request for {[scraper.name for scraper in scrapers]}")
     get_menus(scrapers)
     message = "\n\n".join(str(scraper) for scraper in scrapers)
     max_size = 1500
     parts = list(range(0, len(message), max_size)) + [len(message)]
+    last_message = None
     for i_part, i_start in enumerate(parts[:-1]):
         i_end = parts[i_part + 1]
         actual_message = message[i_start: i_end]
         if i_end != len(message):
             actual_message += "..."
-        await ctx.send(actual_message)
+        last_message = await ctx.send(actual_message)
+    emojis = sorted({scraper.emoji for scraper in scrapers})
+    if last_message is not None:
+        for emoji in emojis:
+            await last_message.add_reaction(emoji)
 
 
 @bot.command(name='loncek-si')
