@@ -15,6 +15,9 @@ class FE(ScraperSoup):
         )
 
     def _parse(self, soup: BeautifulSoup):
+        for day in FE.DAYS:
+            self.menus.append(DailyMenu("Spremenili so html, ne morem parsniti."))
+        return
         parsed_tables = {}
         candidates = list(soup.find_all("h3")) + list(soup.find_all("strong"))
         for candidate in candidates:
