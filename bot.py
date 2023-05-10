@@ -1,4 +1,5 @@
 import os
+import traceback
 from discord.ext import commands
 from dotenv import load_dotenv
 from scraper_loncek import Loncek
@@ -113,7 +114,7 @@ def filter_scrapers(chosen_location, chosen_language):
 async def handler(ctx, *args):
     normalized, unknown = normalize_arguments(args)
     if unknown:
-        send_warning(
+        await send_warning(
             ctx,
             f"There were some unknown arguments: {unknown}. "
             "Ignoring your command."
@@ -136,6 +137,7 @@ async def on_command_error(ctx, error):
         )
     else:
         await ctx.send(f"Unknown error: {error}")
+        LOGGER.error(traceback.format_exc())
 
 if __name__ == '__main__':
     get_menus(list(SCRAPERS.values()))

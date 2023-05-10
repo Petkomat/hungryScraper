@@ -1,6 +1,7 @@
 import re
 from datetime import date, timedelta
 import os
+import traceback
 
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
@@ -11,8 +12,11 @@ from selenium.webdriver import Chrome, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-
 import time
+from helpers import create_logger
+
+
+LOGGER = create_logger(__file__)
 
 
 class Option:
@@ -57,6 +61,7 @@ class Scraper:
         self.emoji = emoji
         self.monday = Scraper.this_monday()
         self.menus = []
+        self._str: str | None = ""
 
     @staticmethod
     def this_monday():
@@ -67,7 +72,9 @@ class Scraper:
     def index_of_today():
         return date.today().weekday()
 
-    def __str__(self):
+    def __str__(self) -> str:
+        if self._str is not None:
+            return self._str
         parts = []
         for days_delta, daily_menu in enumerate(self.menus):
             today = self.monday + timedelta(days=days_delta)
@@ -83,8 +90,15 @@ class Scraper:
             parts.pop()
         everything = "\n\n".join(parts)
         if self.english:
-            everything = tss.google(everything, 'sl', 'en')
-        return f"**{self.name}** {self.emoji}:\n{everything}"
+            for _ in range(10):
+                try:
+                    everything = tss.google(everything, 'sl', 'en')
+                    time.sleep(1.0)
+                    break
+                except TypeError:
+                    LOGGER.error(traceback.format_exc())
+        self._str = f"**{self.name}** {self.emoji}:\n{everything}"
+        return self._str
 
     def _get_menu(self):
         raise NotImplementedError()
@@ -95,6 +109,7 @@ class Scraper:
     def get_menu(self):
         if not self._has_menu():
             self.menus = []
+            self._str = None
             self._get_menu()
             self.monday = Scraper.this_monday()
 
