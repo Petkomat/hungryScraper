@@ -1,7 +1,7 @@
 import logging
 
 
-def create_logger(name):
+def create_logger(name: str):
     ch = logging.StreamHandler()
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)s [%(filename)s:%(funcName)s:%(lineno)d]:  %(message)s",

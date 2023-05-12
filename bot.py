@@ -73,13 +73,13 @@ async def send(
             await last_message.add_reaction(emoji)
 
 
-async def send_warning(ctx, warning):
+async def send_warning(ctx, warning: str):
     await ctx.send(warning)
 
 
-def normalize_arguments(args: List[str]):
-    normalized = []
-    unknown = []
+def normalize_arguments(args: tuple[str]):
+    normalized: list[str] = []
+    unknown: list[str] = []
     for arg in args:
         if arg in LANGUAGES:
             normalized.append(LANGUAGES[arg])
@@ -102,8 +102,8 @@ def get_location_lanugage(args: List[str]):
     return location, language
 
 
-def filter_scrapers(chosen_location, chosen_language):
-    appropriate = []
+def filter_scrapers(chosen_location: str, chosen_language: str):
+    appropriate: list[Scraper] = []
     for (lan, _, loc), scraper in SCRAPERS.items():
         if chosen_language in ["all", lan] and chosen_location in ["all", loc]:
             appropriate.append(scraper)
@@ -111,7 +111,7 @@ def filter_scrapers(chosen_location, chosen_language):
 
 
 @bot.command(name="food")
-async def handler(ctx, *args):
+async def handler(ctx, *args: str):
     normalized, unknown = normalize_arguments(args)
     if unknown:
         await send_warning(

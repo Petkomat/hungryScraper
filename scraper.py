@@ -60,7 +60,7 @@ class Scraper:
         self.only_today = only_today
         self.emoji = emoji
         self.monday = Scraper.this_monday()
-        self.menus = []
+        self.menus: list[DailyMenu] = []
 
     @staticmethod
     def this_monday():
@@ -180,7 +180,7 @@ class ScraperSelenium(Scraper):
 
     @staticmethod
     def unescape(source: str):
-        parts = []
+        parts: list[str] = []
         i = 0
         fake_file = open(os.devnull, "w", encoding="utf-8")
         while i < len(source):
