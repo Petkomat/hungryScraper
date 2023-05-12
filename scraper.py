@@ -61,7 +61,6 @@ class Scraper:
         self.emoji = emoji
         self.monday = Scraper.this_monday()
         self.menus = []
-        self._str: str | None = ""
 
     @staticmethod
     def this_monday():
@@ -73,9 +72,7 @@ class Scraper:
         return date.today().weekday()
 
     def __str__(self) -> str:
-        if self._str is not None:
-            return self._str
-        parts = []
+        parts: list[str] = []
         for days_delta, daily_menu in enumerate(self.menus):
             today = self.monday + timedelta(days=days_delta)
             if self.only_today and today != date.today():
@@ -97,10 +94,9 @@ class Scraper:
                     break
                 except TypeError:
                     LOGGER.error(traceback.format_exc())
-        self._str = f"**{self.name}** {self.emoji}:\n{everything}"
-        return self._str
+        return f"**{self.name}** {self.emoji}:\n{everything}"
 
-    def _get_menu(self):
+    def _get_menu(self) -> None:
         raise NotImplementedError()
 
     def _has_menu(self):
@@ -109,7 +105,6 @@ class Scraper:
     def get_menu(self):
         if not self._has_menu():
             self.menus = []
-            self._str = None
             self._get_menu()
             self.monday = Scraper.this_monday()
 
