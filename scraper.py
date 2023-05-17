@@ -133,7 +133,7 @@ class ScraperSoup(Scraper):
         raise NotImplementedError()
 
     @staticmethod
-    def get_string(html_element):
+    def get_string(html_element) -> str:
         text = html_element.text.replace("\n", " ").replace("\t", " ")
         return re.sub(" +", " ", text).strip()
 

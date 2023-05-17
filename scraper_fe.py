@@ -1,5 +1,9 @@
 from bs4 import BeautifulSoup
 from scraper import ScraperSoup, DailyMenu
+from helpers import create_logger
+
+
+LOGGER = create_logger(__file__)
 
 
 class FE(ScraperSoup):
@@ -15,39 +19,29 @@ class FE(ScraperSoup):
         )
 
     def _parse(self, soup: BeautifulSoup):
-        for day in FE.DAYS:
-            self.menus.append(DailyMenu("Spremenili so html, ne morem parsniti."))
-        return
-        parsed_tables = {}
-        candidates = list(soup.find_all("h3")) + list(soup.find_all("strong"))
-        for candidate in candidates:
-            day = ScraperSoup.get_string(candidate)
-            if day.lower() not in FE.DAYS:
-                continue
-            day = day.lower()
-            parsed_table = []
-            html_table = candidate.findNext("table")
-            for html_row in html_table.find_all("tr"):
-                parsed_row = []
-                for html_cell in html_row.find_all("td"):
-                    parsed_row.append(ScraperSoup.get_string(html_cell))
-                parsed_table.append(parsed_row)
-            parsed_tables[day] = parsed_table
-        for day in FE.DAYS:
-            if day not in parsed_tables:
-                options = "nič"
-            else:
-                parsed_table = parsed_tables[day]
-                daily_options = []
-                for j in range(len(parsed_table[0])):
-                    parts = [parsed_table[i][j] for i in range(1, len(parsed_table)) if parsed_table[i][j]]
-                    daily_options.append(f"{parsed_table[0][j]}: {'; '.join(parts)}")
-                options = "\n".join(daily_options)
-            daily_menu = DailyMenu(options)
+        for candidate in soup.find_all("div", class_="accordion-single"):
+            day_all = ScraperSoup.get_string(candidate.find("h2"))
+            day = FE._extract_day(day_all)
+            if day is None:
+                day = FE.DAYS[len(self.menus)]
+                LOGGER.warning(f"No idea, which day is this: {day_all}, assuming {day}")
+            options: list[str] = []
+            for html_menu in candidate.find_all("li"):
+                option = ScraperSoup.get_string(html_menu)
+                options.append(f"  - {option}")
+            daily_menu = DailyMenu("\n".join(options))
             self.menus.append(daily_menu)
+
+    @staticmethod
+    def _extract_day(day_string: str) -> str | None:
+        day_string = day_string.lower()
+        for day in FE.DAYS:
+            if day_string.startswith(day.lower()):
+                return day
+        return None
 
 
 if __name__ == "__main__":
-    x = FE(False, True)
+    x = FE(False, False)
     x._get_menu()
     print(str(x))
