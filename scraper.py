@@ -86,7 +86,7 @@ class Scraper:
         if parts:
             parts.pop()
         everything = "\n\n".join(parts)
-        if self.english:
+        if self.english and everything:
             for _ in range(10):
                 try:
                     everything = tss.google(everything, 'sl', 'en')
