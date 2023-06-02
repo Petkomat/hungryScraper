@@ -67,6 +67,7 @@ async def send(
         if i_end != len(message):
             actual_message += "..."
         last_message = await ctx.send(actual_message)
+        LOGGER.info(f"Sent message {i_part + 1}/{len(parts) - 1}:\n{actual_message}")
     emojis = sorted({scraper.emoji for scraper in scrapers})
     if last_message is not None:
         for emoji in emojis:

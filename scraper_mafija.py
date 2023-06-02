@@ -70,10 +70,10 @@ class Mafija(ScraperSoup):
         parsed_daily = "; ".join(todays_specialty).lower() if todays_specialty else "neznano"
         parsed_every_day = "; ".join(option for _, option in everyday).lower()
         the_daily_option = Option(
-            f"  - Dnevna ponudba: {parsed_daily}", price="neznana cena"
+            f"- Dnevna ponudba: {parsed_daily}", price="neznana cena"
         )
         everyday_options = Option(
-            f"  - Ostalo: {parsed_every_day}", price="razne cene"
+            f"- Ostalo: {parsed_every_day}", price="razne cene"
         )
         this_day_options = DailyMenu(
             "\n".join([str(the_daily_option), str(everyday_options)])
