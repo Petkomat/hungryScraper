@@ -94,7 +94,19 @@ class Scraper:
                     break
                 except TypeError:
                     LOGGER.error(traceback.format_exc())
-        return f"**{self.name}** {self.emoji}:\n{everything}"
+        raw = f"**{self.name}** {self.emoji}:\n{everything}"
+        return Scraper._postprocess_str(raw)
+    
+    @staticmethod
+    def _postprocess_str(raw: str) -> str:
+        """
+        Takes care of discord peculiarities in formatting. For now, it
+        - removes any space between newline characters and dashes.
+        - adds a space after a dash, if the dash is preceded by a newline character.
+        """
+        better = re.sub(r"\n\s+-", "\n- ", raw)
+        better = re.sub(r"\n-\s*", "\n- ", better)
+        return better
 
     def _get_menu(self) -> None:
         raise NotImplementedError()
@@ -105,7 +117,11 @@ class Scraper:
     def get_menu(self):
         if not self._has_menu():
             self.menus = []
-            self._get_menu()
+            try:
+                self._get_menu()
+            except:
+                LOGGER.error(traceback.format_exc())
+                self.menus = [DailyMenu(f"Nisem mogel prebaviti, obišči {self.url}") for _ in range(5)]
             self.monday = Scraper.this_monday()
 
 
